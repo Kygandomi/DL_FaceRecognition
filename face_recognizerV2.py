@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 from sklearn.cross_validation import train_test_split
 from PIL import Image
+import pickle
 import glob
 # Accuracy: 49.80%
 ####################### METHODS #########################
@@ -44,21 +45,23 @@ def resize_data(input_path, input_path_resized, img_rows, img_cols):
 
 	print ("Resize Complete!")
 
-def load_data(input_path_resized, img_rows, img_cols):
+def load_data():
 	# Get the number of resized, grayscale, images in new path
-	input_frames = glob.glob(input_path_resized + "/" + '*.jpg')
-	input_num_samples = len(input_frames)
-	print ("Number of input samples:", input_num_samples)
+	# input_frames = glob.glob(input_path_resized + "/" + '*.jpg')
+	# input_num_samples = len(input_frames)
+	# print ("Number of input samples:", input_num_samples)
 
 	# create matrix to store all flattened images
-	immatrix = array([array(Image.open(input_path_resized + "/" + input_frame[len(input_path_resized)+1:])).flatten() for input_frame in input_frames],'f')
+	# immatrix = array([array(Image.open(input_path_resized + "/" + input_frame[len(input_path_resized)+1:])).flatten() for input_frame in input_frames],'f')
 
+	immatrix,label= pickle.load(open('database.pickle','rb'))
+	print ("Number of input samples:", len(lable))
 	# hardcode the labels for the data set
-	label=np.ones((input_num_samples,),dtype = int)
-	label[0:3648]=0 # kritika
-	label[3648:]=1 # katie
-	# create more lables here
-	number_of_labels = 2 # for kritika and katie <---------- HARDCODED !
+	# label=np.ones((input_num_samples,),dtype = int)
+	# label[0:3648]=0 # kritika
+	# label[3648:]=1 # katie
+	# # create more lables here
+	number_of_labels = 5 # for kritika and katie <---------- HARDCODED !
 
 	# Now Shuffle all the data and return the values
 	data,Label = shuffle(immatrix,label, random_state=2)
@@ -71,12 +74,12 @@ def load_data(input_path_resized, img_rows, img_cols):
 	X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
 
 	# Reshape the x_data
-	X_train = X_train.reshape(X_train.shape[0], 1, img_rows, img_cols)
-	X_test = X_test.reshape(X_test.shape[0], 1, img_rows, img_cols)
-
+	# X_train = X_train.reshape(X_train.shape[0], 1, img_rows, img_cols)
+	# X_test = X_test.reshape(X_test.shape[0], 1, img_rows, img_cols)
+	#
 	X_train = X_train.astype('float32')
 	X_test = X_test.astype('float32')
-
+	#
 	X_train /= 255
 	X_test /= 255
 
@@ -88,18 +91,17 @@ def load_data(input_path_resized, img_rows, img_cols):
 	return X_train, Y_train, X_test, Y_test
 
 def create_model(img_rows, img_cols):
-	number_of_labels = 2 # for kritika and katie <---------- HARDCODED !
+	number_of_labels = 5 # for kritika and katie, shubham arjun and prakash <---------- HARDCODED !
 	# Create CNN model
 	model = Sequential()
 	model.add(Convolution2D(32, 3, 3, dim_ordering="th", input_shape=(1, img_rows, img_cols), activation='relu'))
 	model.add(Dropout(0.2))
-	model.add(Convolution2D(32, 3, 3, dim_ordering="th", activation='relu'))
+	model.add(Convolution2D(256, 3, 3, dim_ordering="th", activation='relu'))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 	model.add(Flatten())
 	model.add(Dense(128, activation='relu'))
 	model.add(Dropout(0.5))
 	model.add(Dense(number_of_labels, activation='softmax'))
-
 	return model
 
 def compile_model(model, X_train, Y_train, X_test, Y_test):
@@ -146,13 +148,13 @@ def plot_model(history, scores):
 #################### MAIN : CODE RUNS HERE ######################
 #################################################################
 # path to folder of images
-input_path = "data"
-input_path_resized = "data_resized"
-img_rows, img_cols = 169, 300 # Size of resized images
+# input_path = "data"
+# input_path_resized = "data_resized"
+# img_rows, img_cols = 169, 300 # Size of resized images
 
-resize_data(input_path, input_path_resized, img_rows, img_cols)
+# resize_data(input_path, input_path_resized, img_rows, img_cols)
 
-X_train, Y_train, X_test, Y_test = load_data(input_path_resized, img_rows, img_cols)
+X_train, Y_train, X_test, Y_test = load_data()
 print ("Data Loaded Sucessfully!")
 
 # model = create_model(img_rows, img_cols)
