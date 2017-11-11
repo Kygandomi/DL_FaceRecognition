@@ -1,12 +1,3 @@
-###########################################################
-# Deep Learning for Advanced Robot Perception
-# Assignment # 7-8 Face Recognition
-# Convolutional Neural Network for Face Recognition
-# prepared by: Katie Gandomi, Kritika Iyer, Shubham jain
-###########################################################
-# To run on cluster
-
-
 #!/bin/env python3
 # SBATCH -N 1 # No. of computers you wanna use. Typically 1
 # SBATCH -n 2 # No. of CPU cores you wanna use. Typically 1
@@ -15,6 +6,12 @@
 # SBATCH -t 24:00:00 # Amount of time
 # SBATCH --gres=gpu:3 # No. of GPU cores you wanna use. Usually 2-3
 
+###########################################################
+# Deep Learning for Advanced Robot Perception
+# Assignment # 7-8 Face Recognition
+# Convolutional Neural Network for Face Recognition
+# prepared by: Katie Gandomi, Kritika Iyer, Shubham jain
+###########################################################
 
 ##################### IMPORT DEPENDENCIES #################
 import numpy as np
@@ -104,8 +101,8 @@ def load_data():
 	# X_train = X_train.reshape(X_train.shape[0], 1, img_rows, img_cols)
 	# X_test = X_test.reshape(X_test.shape[0], 1, img_rows, img_cols)
 	#
-	X_train = X_train.astype('float32')
-	X_test = X_test.astype('float32')
+	# X_train = X_train.astype('float32')
+	# X_test = X_test.astype('float32')
 	#
 	X_train /= 255
 	X_test /= 255
@@ -154,26 +151,15 @@ def compile_model(model, X_train, Y_train, X_test, Y_test):
 
 	return history, scores
 
-# def plot_model(history, scores):
-# 	# Plot Results
-# 	print ("Plotting...")
-# 	# summarize history for accuracy
-# 	plt.plot(history.history['acc'])
-# 	plt.plot(history.history['val_acc'])
-# 	plt.title('model accuracy')
-# 	plt.ylabel('accuracy')
-# 	plt.xlabel('epoch')
-# 	plt.legend(['train', 'test'], loc='upper left')
-# 	plt.show()
-# 	# summarize history for loss
-# 	plt.plot(history.history['loss'])
-# 	plt.plot(history.history['val_loss'])
-# 	plt.title('model loss')
-# 	plt.ylabel('loss')
-# 	plt.xlabel('epoch')
-# 	plt.legend(['train', 'test'], loc='upper left')
-# 	plt.show()
-
+def plot_model(history, scores):
+	# Plot Results
+	print ("Plotting...")
+	f=open('data.txt','wb')
+	f.write("accuracy,ValAcc, Loss, ValLoss \n")
+	for i in range(len(history.history['acc'])):
+		f.write(str(history.history['acc'][i]) + "," + str(history.history['val_acc'][i]) + "," + str(history.history['loss'][i]) + "," + str(history.history['val_loss'][i]) + "\n")
+	f.close()
+	print ("Done!")
 #################################################################
 #################### MAIN : CODE RUNS HERE ######################
 #################################################################
